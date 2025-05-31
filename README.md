@@ -2,8 +2,6 @@
 
 [![CI](https://github.com/n5bur/qrz-logbook-api/actions/workflows/ci.yml/badge.svg)](https://github.com/n5bur/qrz-logbook-api/actions/workflows/ci.yml)
 
-[![License](https://img.shields.io/crates/l/qrz-logbook-api.svg)](https://github.com/n5bur/qrz-logbook-api)
-
 A comprehensive, type-safe Rust client library for the [QRZ Logbook API](https://www.qrz.com/docs/logbook/QRZLogbookAPI.html). This library provides an easy-to-use interface for amateur radio operators to interact with their QRZ logbooks programmatically.
 
 ## Features
@@ -298,7 +296,6 @@ at your option.
 
 - QRZ.com for providing the logbook API
 - The amateur radio community for ADIF standardization
-- All contributors to this project
 
 ## Disclaimer
 
