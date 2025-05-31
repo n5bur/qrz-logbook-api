@@ -1,0 +1,34 @@
+[package]
+name = "qrz-logbook-api"
+version = "0.1.4"
+edition = "2021"
+authors = ["Luke Burciu <n5bur@burciu.io>"]
+license = "MIT OR Apache-2.0"
+description = "A Rust client library for the QRZ.com HTTP REST interface"
+repository = "https://github.com/n5bur/qrz-logbook-api"
+readme = "README.md"
+keywords = ["ham-radio", "amateur-radio", "qrz", "callsign", "rest"]
+categories = ["api-bindings", "network-programming"]
+rust-version = "1.87.0"
+
+[dependencies]
+reqwest = { version = "0.12.18", features = ["rustls-tls"], default-features = false }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+thiserror = "2.0.12"
+url = "2.4"
+chrono = { version = "0.4", features = ["serde"] }
+urlencoding = "2.1"
+
+[dev-dependencies]
+tokio-test = "0.4"
+wiremock = "0.6.3"
+serde_json = "1.0"
+tempfile = "3.8"
+mockito = "1.2"
+
+[features]
+default = ["native-tls"]
+native-tls = ["reqwest/native-tls"]
+rustls-tls = ["reqwest/rustls-tls"]
