@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Create a sample QSO
-    let qso = QsoRecord::builder()
+    let _qso = QsoRecord::builder()
         .call("W1AW")
         .station_callsign("K1ABC") // Replace with your callsign
         .date(NaiveDate::from_ymd_opt(2024, 1, 15).unwrap())

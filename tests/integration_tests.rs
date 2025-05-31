@@ -1,6 +1,6 @@
 use chrono::{NaiveDate, NaiveTime};
 use qrz_logbook_api::{
-    adif::AdifParser, FetchOptions, QrzLogbookClient, QsoRecord, QrzLogbookError
+    adif::AdifParser, FetchOptions, QrzLogbookClient, QrzLogbookError, QsoRecord,
 };
 
 #[tokio::test]
@@ -19,10 +19,10 @@ async fn test_client_creation_invalid_key() {
 async fn test_client_creation_invalid_user_agent() {
     let result = QrzLogbookClient::new("valid-api-key-12345", "python-requests");
     assert!(matches!(result, Err(QrzLogbookError::InvalidUserAgent)));
-    
+
     let result = QrzLogbookClient::new("valid-api-key-12345", "node-fetch");
     assert!(matches!(result, Err(QrzLogbookError::InvalidUserAgent)));
-    
+
     let result = QrzLogbookClient::new("valid-api-key-12345", "");
     assert!(matches!(result, Err(QrzLogbookError::InvalidUserAgent)));
 }
@@ -55,7 +55,10 @@ fn test_qso_record_builder() {
     assert_eq!(qso.name, Some("John".to_string()));
     assert_eq!(qso.qth, Some("Boston, MA".to_string()));
     assert_eq!(qso.comment, Some("Great signal!".to_string()));
-    assert_eq!(qso.additional_fields.get("gridsquare"), Some(&"FN42aa".to_string()));
+    assert_eq!(
+        qso.additional_fields.get("gridsquare"),
+        Some(&"FN42aa".to_string())
+    );
 }
 
 #[test]
@@ -82,11 +85,10 @@ fn test_fetch_options_all() {
 
 #[test]
 fn test_fetch_options_date_range() {
-    let options = FetchOptions::new()
-        .date_range(
-            NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
-            NaiveDate::from_ymd_opt(2024, 12, 31).unwrap(),
-        );
+    let options = FetchOptions::new().date_range(
+        NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
+        NaiveDate::from_ymd_opt(2024, 12, 31).unwrap(),
+    );
 
     let option_string = options.to_option_string();
     assert!(option_string.contains("DATEFROM:20240101"));
@@ -108,7 +110,7 @@ fn test_adif_generation() {
         .build();
 
     let adif = AdifParser::to_adif(&qso);
-    
+
     assert!(adif.contains("<call:4>W1AW"));
     assert!(adif.contains("<station_callsign:5>K1ABC"));
     assert!(adif.contains("<qso_date:8>20240115"));
@@ -125,7 +127,7 @@ fn test_adif_generation() {
 fn test_adif_parsing() {
     let adif = "<call:4>W1AW<station_callsign:5>K1ABC<qso_date:8>20240115<time_on:4>1430<band:3>20m<mode:3>SSB<freq:5>14.20<rst_sent:2>59<rst_rcvd:2>59<eor>";
     let qsos = AdifParser::parse_adif(adif).unwrap();
-    
+
     assert_eq!(qsos.len(), 1);
     let qso = &qsos[0];
     assert_eq!(qso.call, "W1AW");
@@ -143,14 +145,14 @@ fn test_adif_parsing() {
 fn test_adif_parsing_multiple_records() {
     let adif = r#"<call:4>W1AW<station_callsign:5>K1ABC<qso_date:8>20240115<time_on:4>1430<band:3>20m<mode:3>SSB<eor>
 <call:6>VE3XYZ<station_callsign:5>K1ABC<qso_date:8>20240115<time_on:4>1445<band:3>40m<mode:2>CW<eor>"#;
-    
+
     let qsos = AdifParser::parse_adif(adif).unwrap();
     assert_eq!(qsos.len(), 2);
-    
+
     assert_eq!(qsos[0].call, "W1AW");
     assert_eq!(qsos[0].band, "20m");
     assert_eq!(qsos[0].mode, "SSB");
-    
+
     assert_eq!(qsos[1].call, "VE3XYZ");
     assert_eq!(qsos[1].band, "40m");
     assert_eq!(qsos[1].mode, "CW");
@@ -199,10 +201,10 @@ fn test_adif_roundtrip() {
     // Convert to ADIF and back
     let adif = AdifParser::to_adif(&original_qso);
     let parsed_qsos = AdifParser::parse_adif(&adif).unwrap();
-    
+
     assert_eq!(parsed_qsos.len(), 1);
     let parsed_qso = &parsed_qsos[0];
-    
+
     assert_eq!(parsed_qso.call, original_qso.call);
     assert_eq!(parsed_qso.station_callsign, original_qso.station_callsign);
     assert_eq!(parsed_qso.qso_date, original_qso.qso_date);
@@ -215,7 +217,10 @@ fn test_adif_roundtrip() {
     assert_eq!(parsed_qso.name, original_qso.name);
     assert_eq!(parsed_qso.qth, original_qso.qth);
     assert_eq!(parsed_qso.comment, original_qso.comment);
-    assert_eq!(parsed_qso.additional_fields.get("gridsquare"), Some(&"FN42aa".to_string()));
+    assert_eq!(
+        parsed_qso.additional_fields.get("gridsquare"),
+        Some(&"FN42aa".to_string())
+    );
 }
 
 // Mock tests would require a mock server setup
@@ -224,7 +229,6 @@ fn test_adif_roundtrip() {
 #[cfg(test)]
 mod mock_tests {
     use super::*;
-    use std::collections::HashMap;
 
     // Helper function to create a test client
     fn create_test_client() -> QrzLogbookClient {
@@ -236,7 +240,7 @@ mod mock_tests {
         let client = create_test_client();
         let response = "RESULT=OK&LOGID=130877825&COUNT=1".to_string();
         let result = client.parse_insert_response(response).unwrap();
-        
+
         assert_eq!(result.logid, 130877825);
         assert_eq!(result.count, 1);
     }
@@ -246,7 +250,7 @@ mod mock_tests {
         let client = create_test_client();
         let response = "RESULT=FAIL&REASON=Invalid+QSO+data".to_string();
         let result = client.parse_insert_response(response);
-        
+
         assert!(result.is_err());
         if let Err(QrzLogbookError::Api { reason }) = result {
             assert!(reason.contains("Invalid"));
@@ -260,7 +264,7 @@ mod mock_tests {
         let client = create_test_client();
         let response = "RESULT=OK&COUNT=2".to_string();
         let result = client.parse_delete_response(response).unwrap();
-        
+
         assert_eq!(result.deleted_count, 2);
         assert!(result.not_found_logids.is_empty());
     }
@@ -270,7 +274,7 @@ mod mock_tests {
         let client = create_test_client();
         let response = "RESULT=PARTIAL&COUNT=1&LOGIDS=12346".to_string();
         let result = client.parse_delete_response(response).unwrap();
-        
+
         assert_eq!(result.deleted_count, 1);
         assert_eq!(result.not_found_logids, vec![12346]);
     }
@@ -278,9 +282,10 @@ mod mock_tests {
     #[test]
     fn test_response_parsing_status_success() {
         let client = create_test_client();
-        let response = "RESULT=OK&DATA=total_qsos%3D1234%26confirmed%3D567%26dxcc_total%3D89".to_string();
+        let response =
+            "RESULT=OK&DATA=total_qsos%3D1234%26confirmed%3D567%26dxcc_total%3D89".to_string();
         let result = client.parse_status_response(response).unwrap();
-        
+
         assert_eq!(result.data.get("total_qsos"), Some(&"1234".to_string()));
         assert_eq!(result.data.get("confirmed"), Some(&"567".to_string()));
         assert_eq!(result.data.get("dxcc_total"), Some(&"89".to_string()));
@@ -290,21 +295,24 @@ mod mock_tests {
     fn test_response_parsing_fetch_success() {
         let client = create_test_client();
         let adif_data = "<call:4>W1AW<station_callsign:5>K1ABC<qso_date:8>20240115<time_on:4>1430<band:3>20m<mode:3>SSB<eor>";
-        let response = format!("RESULT=OK&COUNT=1&LOGIDS=12345&ADIF={}", urlencoding::encode(adif_data));
+        let response = format!(
+            "RESULT=OK&COUNT=1&LOGIDS=12345&ADIF={}",
+            urlencoding::encode(adif_data)
+        );
         let result = client.parse_fetch_response(response).unwrap();
-        
+
         assert_eq!(result.count, 1);
         assert_eq!(result.logids, vec![12345]);
         assert_eq!(result.qsos.len(), 1);
         assert_eq!(result.qsos[0].call, "W1AW");
     }
 
-    #[test] 
+    #[test]
     fn test_response_parsing_auth_error() {
         let client = create_test_client();
         let response = "RESULT=AUTH".to_string();
         let result = client.parse_insert_response(response);
-        
+
         assert!(matches!(result, Err(QrzLogbookError::Auth)));
     }
 }

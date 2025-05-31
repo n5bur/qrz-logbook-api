@@ -267,9 +267,9 @@ impl QrzLogbookClient {
         let response = self.client.post(API_ENDPOINT).form(&params).send().await?;
 
         if !response.status().is_success() {
-            return Err(QrzLogbookError::Http(reqwest::Error::from(
+            return Err(QrzLogbookError::Http(
                 response.error_for_status().unwrap_err(),
-            )));
+            ));
         }
 
         Ok(response.text().await?)
@@ -478,7 +478,7 @@ mod tests {
         let client = QrzLogbookClient::new("test-api-key-12345", "TestApp/1.0.0 (N0CALL)").unwrap();
         let response = "RESULT=OK&LOGID=12345&COUNT=1";
         let params = client.parse_response_params(response).unwrap();
-        
+
         assert_eq!(params.get("RESULT"), Some(&"OK".to_string()));
         assert_eq!(params.get("LOGID"), Some(&"12345".to_string()));
         assert_eq!(params.get("COUNT"), Some(&"1".to_string()));

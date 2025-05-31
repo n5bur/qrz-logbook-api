@@ -86,7 +86,6 @@ impl AdifParser {
         Ok(qsos)
     }
 
-    /// Parse a single ADIF record into a QSO record
     fn parse_single_record(record: &str) -> QrzLogbookResult<QsoRecord> {
         let mut fields = HashMap::new();
         let mut pos = 0;
